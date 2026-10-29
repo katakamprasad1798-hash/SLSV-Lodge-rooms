@@ -1,0 +1,189 @@
+[
+  {
+    "room_number": "101",
+    "floor": 1,
+    "category": "Standard",
+    "ac_type": "AC",
+    "bed_count": 1,
+    "rate_per_day": 1200.0,
+    "extra_bed_rate": 0.0,
+    "status": "Available",
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Geyser",
+      "Daily Housekeeping"
+    ],
+    "description": "Cozy single bed non-AC room with attached bathroom.",
+    "id": "room_101",
+    "status_history": [
+      {
+        "id": "st_499d7735",
+        "from_status": "Cleaning",
+        "to_status": "Available",
+        "timestamp": "2026-10-18 15:43",
+        "note": "Status changed from Cleaning to Available",
+        "updated_by": "Staff"
+      },
+      {
+        "id": "st_27a13585",
+        "from_status": "Occupied",
+        "to_status": "Cleaning",
+        "timestamp": "2026-10-18 14:32",
+        "note": "Status changed from Occupied to Cleaning",
+        "updated_by": "Staff"
+      },
+      {
+        "id": "st_572e37cd",
+        "from_status": "Available",
+        "to_status": "Occupied",
+        "timestamp": "2026-10-18 14:29",
+        "note": "Status changed from Available to Occupied",
+        "updated_by": "Staff"
+      },
+      {
+        "id": "st_f107e05a",
+        "from_status": "Cleaning",
+        "to_status": "Available",
+        "timestamp": "2026-10-18 14:28",
+        "note": "Status changed from Cleaning to Available",
+        "updated_by": "Staff"
+      },
+      {
+        "id": "st_bc98d984",
+        "from_status": "Occupied",
+        "to_status": "Cleaning",
+        "timestamp": "2026-10-18 14:27",
+        "note": "Status changed from Occupied to Cleaning",
+        "updated_by": "Staff"
+      },
+      {
+        "id": "st_0c78c595",
+        "from_status": "Available",
+        "to_status": "Occupied",
+        "timestamp": "2026-10-18 14:26",
+        "note": "Status changed from Available to Occupied",
+        "updated_by": "Staff"
+      }
+    ],
+    "current_status_since": "2026-10-18 15:43"
+  },
+  {
+    "room_number": "102",
+    "floor": 1,
+    "category": "Standard",
+    "ac_type": "AC",
+    "bed_count": 2,
+    "rate_per_day": 1200.0,
+    "extra_bed_rate": 0.0,
+    "status": "Available",
+    "amenities": [
+      "Wi-Fi",
+      "Split AC",
+      "LED TV",
+      "Geyser",
+      "Daily Housekeeping"
+    ],
+    "description": "",
+    "id": "room_102"
+  },
+  {
+    "room_number": "103",
+    "floor": 1,
+    "category": "Standard",
+    "ac_type": "AC",
+    "bed_count": 2,
+    "rate_per_day": 1200.0,
+    "extra_bed_rate": 0.0,
+    "status": "Available",
+    "amenities": [
+      "Wi-Fi",
+      "Split AC",
+      "LED TV",
+      "Geyser",
+      "Daily Housekeeping"
+    ],
+    "description": "Wi-Fi, Split AC, LED TV, Geyser",
+    "id": "room_201"
+  },
+  {
+    "room_number": "104",
+    "floor": 1,
+    "category": "Standard",
+    "ac_type": "Non-AC",
+    "bed_count": 1,
+    "rate_per_day": 1000.0,
+    "extra_bed_rate": 300.0,
+    "status": "Available",
+    "amenities": [
+      "Wi-Fi",
+      "LED TV",
+      "Daily Housekeeping"
+    ],
+    "description": "",
+    "current_status_since": null,
+    "status_history": [],
+    "id": "room_202"
+  },
+  {
+    "room_number": "105",
+    "floor": 1,
+    "category": "Standard",
+    "ac_type": "Non-AC",
+    "bed_count": 1,
+    "rate_per_day": 1000.0,
+    "extra_bed_rate": 300.0,
+    "status": "Available",
+    "amenities": [
+      "Wi-Fi",
+      "LED TV",
+      "Geyser",
+      "Daily Housekeeping"
+    ],
+    "description": "",
+    "current_status_since": null,
+    "status_history": [],
+    "id": "room_301"
+  },
+  {
+    "room_number": "106",
+    "floor": 1,
+    "category": "Standard",
+    "ac_type": "Non-AC",
+    "bed_count": 1,
+    "rate_per_day": 1000.0,
+    "extra_bed_rate": 0.0,
+    "status": "Available",
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Geyser",
+      "Daily Housekeeping"
+    ],
+    "description": "",
+    "current_status_since": null,
+    "status_history": [],
+    "id": "room_1305993b"
+  },
+  {
+    "room_number": "Party Hall",
+    "floor": 1,
+    "category": "Standard",
+    "ac_type": "AC",
+    "bed_count": 1,
+    "rate_per_day": 4500.0,
+    "extra_bed_rate": 300.0,
+    "status": "Available",
+    "amenities": [
+      "Wi-Fi",
+      "TV",
+      "Geyser",
+      "Ac",
+      "Daily Housekeeping"
+    ],
+    "description": "",
+    "current_status_since": null,
+    "status_history": [],
+    "id": "room_c303ba6c"
+  }
+]

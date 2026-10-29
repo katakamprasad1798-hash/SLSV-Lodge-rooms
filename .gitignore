@@ -1,0 +1,31 @@
+# Node dependencies
+node_modules/
+frontend/node_modules/
+
+# Python Virtual Environment & Cache
+venv/
+backend/venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment & Secrets
+.env
+backend/.env
+frontend/.env
+*.env
+firebase_credentials.json
+backend/firebase_credentials.json
+
+# Builds & Generated Outputs
+frontend/dist/
+frontend/android/app/build/
+frontend/android/.gradle/
+frontend/android/build/
+.gradle/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.log

@@ -1,0 +1,190 @@
+[
+  {
+    "id": "bk_d220f7a5",
+    "booking_number": "BK-20260913-101",
+    "guest": {
+      "name": "katakam prasad",
+      "phone": "+919912144667",
+      "email": "katakampd@gmail.com",
+      "id_type": "Aadhaar",
+      "id_number": "",
+      "address": "DIVILi Main Road Near Sai Baba Temple"
+    },
+    "room_id": "room_101",
+    "room_number": "101",
+    "room_category": "Standard",
+    "rate_per_day": 1200.0,
+    "extra_bed_rate": 0.0,
+    "check_in": "2026-09-13 13:19",
+    "check_out": "2026-09-13 18:58",
+    "expected_checkout": "2026-09-14",
+    "status": "CheckedOut",
+    "extra_bed_count": 0,
+    "advance_paid": 0.0,
+    "services": [],
+    "notes": "",
+    "created_at": "2026-09-13 18:49"
+  },
+  {
+    "guest": {
+      "name": "Rahul Sharma",
+      "phone": "+91 98765 43210",
+      "email": "rahul.sharma@example.com",
+      "id_type": "Aadhaar",
+      "id_number": "9876-5432-1098",
+      "address": "Plot 42, Jubilee Hills, Hyderabad"
+    },
+    "room_id": "room_102",
+    "room_number": "102",
+    "room_category": "Standard",
+    "rate_per_day": 1200.0,
+    "extra_bed_rate": 300.0,
+    "check_in": "2026-09-17 12:31",
+    "check_out": "2026-09-17 12:41",
+    "expected_checkout": "2026-09-18",
+    "status": "CheckedOut",
+    "extra_bed_count": 1,
+    "advance_paid": 500.0,
+    "services": [
+      {
+        "id": "srv_sample1",
+        "title": "Welcome Tea & Bottled Water",
+        "amount": 100.0,
+        "category": "Beverages",
+        "created_at": "2026-09-17 12:31"
+      }
+    ],
+    "notes": "Test guest stay for testing billing & checkout flow",
+    "booking_number": "BK-20260917-102",
+    "created_at": "2026-09-17 12:31",
+    "id": "bk_9474fe00"
+  },
+  {
+    "id": "bk_5c88b5cc",
+    "booking_number": "BK-20261016-106",
+    "guest": {
+      "name": "kancharla radhika",
+      "phone": "+917013477084",
+      "email": "radhakancharla15@gmail.com",
+      "id_type": "Aadhaar",
+      "id_number": "",
+      "address": "pedapalla",
+      "gstin": "",
+      "business_name": ""
+    },
+    "room_id": "room_1305993b",
+    "room_number": "106",
+    "room_category": "Standard",
+    "rate_per_day": 1000.0,
+    "extra_bed_rate": 0.0,
+    "check_in": "2026-10-16 06:07",
+    "check_out": "2026-10-16 11:37",
+    "expected_checkout": "2026-10-17",
+    "status": "CheckedOut",
+    "extra_bed_count": 0,
+    "advance_paid": 0.0,
+    "services": [],
+    "notes": "",
+    "created_at": "2026-10-16 11:37"
+  },
+  {
+    "id": "bk_f5bb530b",
+    "booking_number": "BK-20261016-101",
+    "guest": {
+      "name": "SUJATHA KANCHARLA",
+      "phone": "+917013477084",
+      "email": "KVRADHIKA2252@GMAIL.COM",
+      "id_type": "Aadhaar",
+      "id_number": "",
+      "address": "2-150 JASTI VARI STREET",
+      "gstin": "",
+      "business_name": ""
+    },
+    "room_id": "room_101",
+    "room_number": "101",
+    "room_category": "Standard",
+    "rate_per_day": 1200.0,
+    "extra_bed_rate": 0.0,
+    "check_in": "2026-10-16 06:40",
+    "check_out": "2026-10-16 12:11",
+    "expected_checkout": "2026-10-17",
+    "status": "CheckedOut",
+    "extra_bed_count": 0,
+    "advance_paid": 0.0,
+    "services": [
+      {
+        "id": "srv_e3b1caa1",
+        "title": "Airport Pickup / Drop",
+        "amount": 800.0,
+        "category": "Transport",
+        "created_at": "2026-10-16 12:11"
+      }
+    ],
+    "notes": "",
+    "created_at": "2026-10-16 12:10"
+  },
+  {
+    "id": "bk_4a0a88a1",
+    "booking_number": "BK-20261018-101",
+    "guest": {
+      "name": "Prasad",
+      "phone": "+919912144667",
+      "email": "katakampd@gmail.com",
+      "id_type": "Aadhaar",
+      "id_number": "",
+      "address": "DIVILi Main Road Near Sai Baba Temple",
+      "gstin": "",
+      "business_name": ""
+    },
+    "room_id": "room_101",
+    "room_number": "101",
+    "room_category": "Standard",
+    "rate_per_day": 1200.0,
+    "extra_bed_rate": 0.0,
+    "check_in": "2026-10-18 08:56",
+    "check_out": "2026-10-18 14:27",
+    "expected_checkout": "2026-10-19",
+    "status": "CheckedOut",
+    "extra_bed_count": 0,
+    "advance_paid": 0.0,
+    "services": [
+      {
+        "id": "srv_674cd97e",
+        "title": "Airport Pickup / Drop",
+        "amount": 800.0,
+        "category": "Transport",
+        "created_at": "2026-10-18 14:26"
+      }
+    ],
+    "notes": "",
+    "created_at": "2026-10-18 14:26"
+  },
+  {
+    "id": "bk_a5cbf2c6",
+    "booking_number": "BK-20261018-101",
+    "guest": {
+      "name": "Raja",
+      "phone": "+919912144667",
+      "email": "katakampd@gmail.com",
+      "id_type": "Voter ID",
+      "id_number": "",
+      "address": "DIVILi Main Road Near Sai Baba Temple",
+      "gstin": "",
+      "business_name": ""
+    },
+    "room_id": "room_101",
+    "room_number": "101",
+    "room_category": "Standard",
+    "rate_per_day": 1200.0,
+    "extra_bed_rate": 0.0,
+    "check_in": "2026-10-18 08:59",
+    "check_out": "2026-10-18 14:32",
+    "expected_checkout": "2026-10-19",
+    "status": "CheckedOut",
+    "extra_bed_count": 0,
+    "advance_paid": 500.0,
+    "services": [],
+    "notes": "",
+    "created_at": "2026-10-18 14:29"
+  }
+]

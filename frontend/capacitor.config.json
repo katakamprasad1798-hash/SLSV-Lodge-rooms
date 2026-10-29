@@ -1,0 +1,9 @@
+{
+  "appId": "com.slsv.lodge",
+  "appName": "SLSV Lodge",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  }
+}

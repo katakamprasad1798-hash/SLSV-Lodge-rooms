@@ -1,0 +1,22 @@
+[
+  {
+    "id": "admin-1",
+    "name": "Administrator",
+    "email": "admin@lodge.com",
+    "password": "adminpassword123",
+    "role": "Administrator",
+    "phone": "+919876543210",
+    "created_at": "2026-10-14T06:07:59.774516",
+    "last_login": "2026-10-29T15:02:33.317500"
+  },
+  {
+    "id": "f03927b8-c57b-4bfc-b052-3d888e55c217",
+    "name": "Prasad",
+    "email": "katakampd@gmail.com",
+    "password": "Prasad@143",
+    "role": "Administrator",
+    "phone": "9912144667",
+    "created_at": "2026-10-29T05:55:01.566315",
+    "last_login": null
+  }
+]
