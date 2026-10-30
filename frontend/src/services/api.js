@@ -3,7 +3,7 @@
 
 import { localDb } from './localDb';
 
-export const DEFAULT_SERVER_URL = 'https://outreach-mental-assure-steering.trycloudflare.com/api';
+export const DEFAULT_SERVER_URL = 'https://jan-cheers-companion-dam.trycloudflare.com/api';
 
 export const isCapacitor = typeof window !== 'undefined' && (
   window.location.protocol === 'capacitor:' ||
@@ -20,11 +20,11 @@ export function getIsOffline() {
 
 export function getApiBase() {
   const savedServerUrl = typeof localStorage !== 'undefined' ? localStorage.getItem('slsv_custom_api_url') : null;
-  // If the saved URL is an old local LAN IP, ignore and clear it so mobile app connects cleanly
-  if (savedServerUrl && (savedServerUrl.includes('10.205.') || savedServerUrl.includes('192.168.') || savedServerUrl.includes('127.0.0.1') || savedServerUrl.includes('localhost:8000'))) {
-    try { localStorage.removeItem('slsv_custom_api_url'); } catch (e) {}
+  // If user has set a custom URL (e.g. cloud tunnel or LAN IP), use it
+  if (savedServerUrl && savedServerUrl.trim()) {
+    return savedServerUrl.trim().replace(/\/$/, '');
   }
-  const customApiUrl = import.meta.env.VITE_API_URL || (savedServerUrl && !savedServerUrl.includes('10.205.') ? savedServerUrl : null);
+  const customApiUrl = import.meta.env.VITE_API_URL;
   if (customApiUrl) {
     return customApiUrl.replace(/\/$/, '');
   }
@@ -44,8 +44,8 @@ export function setApiBase(url) {
 async function fetchJson(url, options = {}) {
   const apiBase = getApiBase();
   const controller = new AbortController();
-  // 3 second timeout for quick fallback to local DB on mobile
-  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 3000);
+  // 4 second timeout for quick fallback to local DB on mobile
+  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 4000);
 
   let response;
   try {
@@ -86,10 +86,14 @@ async function fetchJson(url, options = {}) {
 }
 
 // Executes a server request with automatic seamless fallback to local standalone database
-async function withFallback(serverCall, localCall) {
+// and auto-caches live server data into local storage for seamless offline access.
+async function withFallback(serverCall, localCall, onServerSuccess) {
   try {
     const res = await serverCall();
     isUsingOfflineDb = false;
+    if (onServerSuccess && typeof onServerSuccess === 'function') {
+      try { onServerSuccess(res); } catch (e) {}
+    }
     return res;
   } catch (err) {
     console.info('[SLSV Lodge] Operating in Standalone Mode via Local Engine:', err.message);
@@ -100,7 +104,10 @@ async function withFallback(serverCall, localCall) {
 
 export const api = {
   // Stats
-  getStats: () => withFallback(() => fetchJson('/stats'), () => localDb.getStats()),
+  getStats: () => withFallback(
+    () => fetchJson('/stats'),
+    () => localDb.getStats()
+  ),
 
   // Rooms
   getRooms: (status, category) => {
@@ -108,7 +115,15 @@ export const api = {
     if (status) params.append('status', status);
     if (category) params.append('category', category);
     const query = params.toString() ? `?${params.toString()}` : '';
-    return withFallback(() => fetchJson(`/rooms${query}`), () => localDb.getRooms(status, category));
+    return withFallback(
+      () => fetchJson(`/rooms${query}`),
+      () => localDb.getRooms(status, category),
+      (data) => {
+        if (!status && !category && Array.isArray(data) && data.length > 0) {
+          try { localStorage.setItem('slsv_local_rooms', JSON.stringify(data)); } catch (e) {}
+        }
+      }
+    );
   },
 
   getRoom: (id) => withFallback(() => fetchJson(`/rooms/${id}`), () => localDb.getRoom(id)),
@@ -140,7 +155,15 @@ export const api = {
   // Bookings
   getBookings: (status) => {
     const query = status ? `?status=${encodeURIComponent(status)}` : '';
-    return withFallback(() => fetchJson(`/bookings${query}`), () => localDb.getBookings(status));
+    return withFallback(
+      () => fetchJson(`/bookings${query}`),
+      () => localDb.getBookings(status),
+      (data) => {
+        if (!status && Array.isArray(data)) {
+          try { localStorage.setItem('slsv_local_bookings', JSON.stringify(data)); } catch (e) {}
+        }
+      }
+    );
   },
 
   getBooking: (id) => withFallback(() => fetchJson(`/bookings/${id}`), () => localDb.getBooking(id)),
@@ -171,7 +194,15 @@ export const api = {
     if (search) params.append('search', search);
     if (paymentMethod) params.append('payment_method', paymentMethod);
     const query = params.toString() ? `?${params.toString()}` : '';
-    return withFallback(() => fetchJson(`/invoices${query}`), () => localDb.getInvoices(search, paymentMethod));
+    return withFallback(
+      () => fetchJson(`/invoices${query}`),
+      () => localDb.getInvoices(search, paymentMethod),
+      (data) => {
+        if (!search && (!paymentMethod || paymentMethod === 'All') && Array.isArray(data) && data.length > 0) {
+          try { localStorage.setItem('slsv_local_invoices', JSON.stringify(data)); } catch (e) {}
+        }
+      }
+    );
   },
 
   getInvoice: (id) => withFallback(() => fetchJson(`/invoices/${id}`), () => localDb.getInvoice(id)),
@@ -195,7 +226,15 @@ export const api = {
     ),
 
   // Settings
-  getSettings: () => withFallback(() => fetchJson('/settings'), () => localDb.getSettings()),
+  getSettings: () => withFallback(
+    () => fetchJson('/settings'),
+    () => localDb.getSettings(),
+    (data) => {
+      if (data && typeof data === 'object') {
+        try { localStorage.setItem('slsv_local_settings', JSON.stringify(data)); } catch (e) {}
+      }
+    }
+  ),
 
   updateSettings: (settingsData) =>
     withFallback(

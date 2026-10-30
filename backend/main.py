@@ -2,7 +2,8 @@ import os
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from routes import rooms, bookings, invoices, settings, stats, auth
 from config import is_firebase_active, logger
@@ -57,14 +58,39 @@ app.include_router(settings.router)
 app.include_router(stats.router)
 app.include_router(auth.router)
 
-@app.get("/")
-def root():
+@app.get("/api")
+def api_root():
     return {
         "status": "Online",
         "app": "Lodge Booking & Bill Generation API",
         "database": "Google Firebase Firestore" if is_firebase_active else "Local Persistent JSON DB (Fallback Mode)",
         "docs": "/docs"
     }
+
+frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))
+
+if os.path.exists(frontend_dist):
+    assets_dir = os.path.join(frontend_dist, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        if full_path.startswith("api") or full_path.startswith("docs") or full_path.startswith("openapi.json"):
+            return JSONResponse(status_code=404, content={"detail": "Not found"})
+        target_file = os.path.join(frontend_dist, full_path)
+        if full_path and os.path.isfile(target_file):
+            return FileResponse(target_file)
+        return FileResponse(os.path.join(frontend_dist, "index.html"))
+else:
+    @app.get("/")
+    def root():
+        return {
+            "status": "Online",
+            "app": "Lodge Booking & Bill Generation API",
+            "database": "Google Firebase Firestore" if is_firebase_active else "Local Persistent JSON DB (Fallback Mode)",
+            "docs": "/docs"
+        }
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))

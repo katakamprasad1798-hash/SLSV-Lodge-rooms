@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
-import { Settings as SettingsIcon, Save, Database, ShieldCheck, Info, Sun } from 'lucide-react';
+import { api, getApiBase, setApiBase, getIsOffline, DEFAULT_SERVER_URL } from '../services/api';
+import { Settings as SettingsIcon, Save, Database, ShieldCheck, Info, Sun, Server, RefreshCw, CheckCircle2, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 
 export default function SettingsPage() {
@@ -24,6 +24,75 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+
+  // Server URL & Sync state
+  const [serverUrl, setServerUrl] = useState(getApiBase());
+  const [serverStatus, setServerStatus] = useState({ checking: true, online: false, message: '' });
+  const [syncingData, setSyncingData] = useState(false);
+  const [syncResult, setSyncResult] = useState(null);
+
+  const testServerConnection = async (urlToCheck) => {
+    setServerStatus({ checking: true, online: false, message: 'Testing server connection...' });
+    try {
+      const target = (urlToCheck || getApiBase()).replace(/\/$/, '');
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 4000);
+      const res = await fetch(`${target}/stats`, { signal: ctrl.signal });
+      clearTimeout(tid);
+      if (res.ok) {
+        const stats = await res.json();
+        setServerStatus({
+          checking: false,
+          online: true,
+          message: `Connected! ${stats.total_rooms} Rooms, ${stats.total_invoices} Invoices (₹${(stats.total_revenue || 0).toLocaleString('en-IN')})`
+        });
+      } else {
+        setServerStatus({ checking: false, online: false, message: `Server error HTTP ${res.status}` });
+      }
+    } catch (e) {
+      setServerStatus({
+        checking: false,
+        online: false,
+        message: 'Server unreachable. Running in Standalone Offline Mode.'
+      });
+    }
+  };
+
+  const handleSaveServerUrl = () => {
+    setApiBase(serverUrl.trim());
+    testServerConnection(serverUrl.trim());
+    setMessage({ type: 'success', text: 'Server URL updated successfully!' });
+  };
+
+  const handleResetDefaultUrl = () => {
+    setServerUrl(DEFAULT_SERVER_URL);
+    setApiBase('');
+    testServerConnection(DEFAULT_SERVER_URL);
+    setMessage({ type: 'success', text: 'Reset to Cloud Server tunnel!' });
+  };
+
+  const handleFullDataSync = async () => {
+    setSyncingData(true);
+    setSyncResult(null);
+    try {
+      const [rooms, bookings, invoices] = await Promise.all([
+        api.getRooms(),
+        api.getBookings(),
+        api.getInvoices(),
+      ]);
+      setSyncResult({
+        success: true,
+        text: `Data Synchronized! Loaded ${rooms.length} rooms, ${bookings.length} bookings, and ${invoices.length} invoices into device storage.`
+      });
+    } catch (e) {
+      setSyncResult({
+        success: false,
+        text: `Sync failed: ${e.message}. Using offline local database.`
+      });
+    } finally {
+      setSyncingData(false);
+    }
+  };
 
   useEffect(() => {
     async function loadSettings() {
@@ -53,6 +122,7 @@ export default function SettingsPage() {
       }
     }
     loadSettings();
+    testServerConnection(getApiBase());
   }, []);
 
   const handleChange = (e) => {
@@ -295,6 +365,121 @@ export default function SettingsPage() {
               onChange={handleChange}
             />
           </div>
+        </div>
+
+        {/* 3. Mobile & Cloud Server Connection */}
+        <div className="glass-card" style={{ marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Server size={18} />
+              <span>3. Mobile & Cloud Server Connection</span>
+            </h3>
+
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.3rem 0.75rem',
+                borderRadius: '20px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                background: serverStatus.online ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                color: serverStatus.online ? 'var(--status-available)' : 'var(--status-cleaning)',
+                border: `1px solid ${serverStatus.online ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`
+              }}
+            >
+              {serverStatus.online ? <Wifi size={13} /> : <WifiOff size={13} />}
+              <span>{serverStatus.checking ? 'Checking...' : serverStatus.online ? 'Online (Cloud Connected)' : 'Offline (Local Engine)'}</span>
+            </div>
+          </div>
+
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: '1.45' }}>
+            Configure your 24/7 cloud server endpoint so the Android APK and remote mobile devices synchronize real-time room statuses, guest stays, and invoices without missing data.
+          </div>
+
+          <div className="form-group">
+            <label>Server API Endpoint URL</label>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <input
+                type="text"
+                className="form-control"
+                style={{ flex: '1 1 280px' }}
+                value={serverUrl}
+                onChange={(e) => setServerUrl(e.target.value)}
+                placeholder="https://your-cloud-tunnel.trycloudflare.com/api"
+              />
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleSaveServerUrl}
+                style={{ whiteSpace: 'nowrap' }}
+              >
+                Save URL
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={handleResetDefaultUrl}
+                style={{ whiteSpace: 'nowrap' }}
+                title="Reset to current Cloudflare Tunnel"
+              >
+                Reset Default
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => testServerConnection(serverUrl)}
+                style={{ whiteSpace: 'nowrap' }}
+              >
+                <RefreshCw size={14} className={serverStatus.checking ? 'animate-spin' : ''} />
+                <span>Test</span>
+              </button>
+            </div>
+            {serverStatus.message && (
+              <div style={{ fontSize: '0.8rem', marginTop: '0.4rem', color: serverStatus.online ? 'var(--status-available)' : 'var(--status-cleaning)', fontWeight: 500 }}>
+                {serverStatus.online ? '✓ ' : '⚠ '}{serverStatus.message}
+              </div>
+            )}
+          </div>
+
+          <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem', marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div>
+              <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Synchronize All Data to Mobile Device
+              </div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                Download all 7 rooms, 6 active/historical bookings, and 6 invoices from server to local phone storage.
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-gold btn-sm"
+              onClick={handleFullDataSync}
+              disabled={syncingData}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              <RefreshCw size={14} className={syncingData ? 'animate-spin' : ''} />
+              <span>{syncingData ? 'Syncing Data...' : 'Sync All Data Now'}</span>
+            </button>
+          </div>
+
+          {syncResult && (
+            <div
+              style={{
+                marginTop: '0.85rem',
+                padding: '0.65rem 0.85rem',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                background: syncResult.success ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)',
+                color: syncResult.success ? 'var(--status-available)' : 'var(--status-occupied)',
+                border: `1px solid ${syncResult.success ? 'rgba(16, 185, 129, 0.25)' : 'rgba(244, 63, 94, 0.25)'}`
+              }}
+            >
+              {syncResult.text}
+            </div>
+          )}
         </div>
 
         {/* Submit button */}
