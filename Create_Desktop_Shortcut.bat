@@ -11,3 +11,4 @@ echo oLink.Save >> %SCRIPT%
 cscript /nologo %SCRIPT%
 del %SCRIPT%
 echo Desktop shortcut created successfully on your Windows Desktop!
+

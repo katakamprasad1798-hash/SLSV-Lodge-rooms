@@ -8,3 +8,4 @@ contextBridge.exposeInMainWorld('desktopApp', {
   printToPDF: (options) => ipcRenderer.invoke('print-to-pdf', options),
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
 });
+

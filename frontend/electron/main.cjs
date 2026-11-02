@@ -1,12 +1,33 @@
-const { app, BrowserWindow, Menu, ipcMain, shell, dialog } = require('electron');
+const electron = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, shell, dialog } = electron;
 const path = require('path');
 const { spawn } = require('child_process');
 const http = require('http');
+const fs = require('fs');
+
+const logFilePath = 'F:\\lodge\\desktop_debug.log';
+function logDesktop(...args) {
+  const line = `[${new Date().toISOString()}] ${args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ')}\n`;
+  try {
+    fs.appendFileSync(logFilePath, line);
+  } catch (e) {}
+  console.log(...args);
+}
+
+logDesktop('[DesktopApp] Starting main process. PID:', process.pid);
+
+process.on('uncaughtException', (err) => {
+  logDesktop('[DesktopApp] Uncaught exception:', err.stack || err.message);
+});
+
+process.on('unhandledRejection', (reason) => {
+  logDesktop('[DesktopApp] Unhandled rejection:', reason);
+});
 
 let mainWindow = null;
 let backendProcess = null;
 
-const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+const isDev = !app.isPackaged && (process.env.NODE_ENV === 'development' || Boolean(process.env.VITE_DEV_SERVER_URL));
 const BACKEND_PORT = 8000;
 
 // Helper to check if backend is already running
@@ -31,32 +52,42 @@ async function ensureBackendRunning() {
     return;
   }
 
-  const backendDir = path.resolve(__dirname, '..', '..', 'backend');
-  const pythonExe = process.platform === 'win32'
-    ? path.join(backendDir, 'venv', 'Scripts', 'python.exe')
-    : path.join(backendDir, 'venv', 'bin', 'python');
+  // Look for backend directory
+  const potentialBackendDirs = [
+    path.resolve(process.resourcesPath, '..', '..', '..', 'backend'),
+    path.resolve(__dirname, '..', '..', 'backend'),
+    path.resolve(app.getAppPath(), '..', '..', 'backend'),
+    'F:\\lodge\\backend',
+  ];
 
   const fs = require('fs');
-  if (fs.existsSync(pythonExe)) {
-    try {
-      console.log('[DesktopApp] Starting FastAPI backend via ' + pythonExe);
-      backendProcess = spawn(
-        pythonExe,
-        ['-m', 'uvicorn', 'main:app', '--host', '0.0.0.0', '--port', BACKEND_PORT.toString()],
-        {
-          cwd: backendDir,
-          stdio: 'ignore',
-          detached: true,
-          windowsHide: true,
-        }
-      );
-      backendProcess.unref();
-    } catch (err) {
-      console.warn('[DesktopApp] Failed to auto-spawn backend:', err.message);
+  for (const dir of potentialBackendDirs) {
+    const pythonExe = process.platform === 'win32'
+      ? path.join(dir, 'venv', 'Scripts', 'python.exe')
+      : path.join(dir, 'venv', 'bin', 'python');
+
+    if (fs.existsSync(pythonExe)) {
+      try {
+        console.log('[DesktopApp] Starting FastAPI backend via ' + pythonExe);
+        backendProcess = spawn(
+          pythonExe,
+          ['-m', 'uvicorn', 'main:app', '--host', '0.0.0.0', '--port', BACKEND_PORT.toString()],
+          {
+            cwd: dir,
+            stdio: 'ignore',
+            detached: true,
+            windowsHide: true,
+          }
+        );
+        backendProcess.unref();
+        return;
+      } catch (err) {
+        console.warn('[DesktopApp] Failed to auto-spawn backend:', err.message);
+      }
     }
-  } else {
-    console.log('[DesktopApp] Python virtualenv not found at ' + pythonExe + '. Operating in Standalone Offline DB Mode.');
   }
+
+  console.log('[DesktopApp] Backend executable not found. Operating in Standalone Offline DB Mode.');
 }
 
 function createMainWindow() {
@@ -76,16 +107,39 @@ function createMainWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: false,
+      webSecurity: false, // Allow local file loading smoothly
     },
   });
 
-  // Smooth appearance once ready
+  // Log renderer console messages for debugging
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    logDesktop(`[Renderer] [level ${level}] ${message} (${sourceId}:${line})`);
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    logDesktop('[DesktopApp] did-finish-load successfully');
+  });
+
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    logDesktop(`[DesktopApp] Page failed to load: ${validatedURL} (${errorCode} - ${errorDescription})`);
+  });
+
+  mainWindow.webContents.on('render-process-gone', (event, details) => {
+    logDesktop('[DesktopApp] render-process-gone:', details);
+  });
+
   mainWindow.once('ready-to-show', () => {
+    logDesktop('[DesktopApp] ready-to-show event fired. Calling mainWindow.show()');
     mainWindow.show();
-    if (isDev) {
-      // Optional devtools in dev
-      // mainWindow.webContents.openDevTools({ mode: 'detach' });
-    }
+  });
+
+  mainWindow.on('close', () => {
+    logDesktop('[DesktopApp] mainWindow close event fired');
+  });
+
+  mainWindow.on('closed', () => {
+    logDesktop('[DesktopApp] mainWindow closed event fired');
+    mainWindow = null;
   });
 
   // Construct application menu
@@ -181,17 +235,20 @@ function createMainWindow() {
   Menu.setApplicationMenu(menu);
 
   // Load URL or build file
-  const devUrl = process.env.VITE_DEV_SERVER_URL || (isDev ? 'http://localhost:5173' : null);
+  const devUrl = process.env.VITE_DEV_SERVER_URL;
 
   if (devUrl) {
+    console.log('[DesktopApp] Loading dev URL:', devUrl);
     mainWindow.loadURL(devUrl).catch(() => {
-      // Fallback to dist if dev server not running
       const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
       mainWindow.loadFile(indexPath);
     });
   } else {
     const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
-    mainWindow.loadFile(indexPath);
+    console.log('[DesktopApp] Loading production index file:', indexPath);
+    mainWindow.loadFile(indexPath).catch((err) => {
+      console.error('[DesktopApp] Failed to loadFile:', err);
+    });
   }
 
   // Intercept window.open or target="_blank"
@@ -202,9 +259,6 @@ function createMainWindow() {
     return { action: 'deny' };
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
 }
 
 // IPC Handlers
@@ -248,10 +302,12 @@ ipcMain.handle('open-external', async (event, url) => {
 
 // App Lifecycle
 app.whenReady().then(async () => {
+  logDesktop('[DesktopApp] app.whenReady fired');
   await ensureBackendRunning();
   createMainWindow();
 
   app.on('activate', () => {
+    logDesktop('[DesktopApp] app.on activate');
     if (BrowserWindow.getAllWindows().length === 0) {
       createMainWindow();
     }
@@ -259,15 +315,21 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', () => {
+  logDesktop('[DesktopApp] app.on window-all-closed');
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
 app.on('will-quit', () => {
+  logDesktop('[DesktopApp] app.on will-quit');
   if (backendProcess) {
     try {
       backendProcess.kill();
     } catch (e) {}
   }
+});
+
+app.on('quit', (event, exitCode) => {
+  logDesktop('[DesktopApp] app.on quit with exitCode:', exitCode);
 });
