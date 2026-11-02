@@ -10,6 +10,17 @@ A modern, high-performance **Hotel & Lodge Management System** designed for desk
 
 ---
 
+## 🖥️ Native Windows Desktop Application
+
+The management portal is packaged as a native Windows x64 Desktop Application powered by **Electron**:
+- **Application Executable**: [`frontend/release/SLSV Lodge-win32-x64/SLSV Lodge.exe`](frontend/release/SLSV%20Lodge-win32-x64/SLSV%20Lodge.exe)
+- **One-Click Launcher**: Double-click [`SLSV_Lodge_Desktop.bat`](SLSV_Lodge_Desktop.bat) in the root directory.
+- **Desktop Shortcut**: Run [`Create_Desktop_Shortcut.bat`](Create_Desktop_Shortcut.bat) to place a shortcut directly on your Windows Desktop.
+- **Auto-Backend Integration**: Automatically boots or connects to the local FastAPI backend, with full offline local database fallback if disconnected.
+- **Native Print & Shortcuts**: Full support for native invoice printing (`Ctrl+P`), instant reload (`Ctrl+R`), and fullscreen (`F11`).
+
+---
+
 ## 📱 Mobile Preview & Android APK
 
 The project compiles directly into a standalone Android APK.
