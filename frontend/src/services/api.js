@@ -3,12 +3,16 @@
 
 import { localDb } from './localDb';
 
-export const DEFAULT_SERVER_URL = 'https://jan-cheers-companion-dam.trycloudflare.com/api';
+export const DEFAULT_SERVER_URL = 'https://equal-bears-kruger-identified.trycloudflare.com/api';
 
-export const isCapacitor = typeof window !== 'undefined' && (
+export const isElectron = typeof window !== 'undefined' && Boolean(
+  window.desktopApp?.isDesktop ||
+  (typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes(' electron/'))
+);
+
+export const isCapacitor = typeof window !== 'undefined' && !isElectron && (
   window.location.protocol === 'capacitor:' ||
   window.location.protocol === 'ionic:' ||
-  window.location.protocol === 'file:' ||
   (typeof window.Capacitor !== 'undefined' && Boolean(window.Capacitor.isNativePlatform?.()))
 );
 
@@ -27,6 +31,9 @@ export function getApiBase() {
   const customApiUrl = import.meta.env.VITE_API_URL;
   if (customApiUrl) {
     return customApiUrl.replace(/\/$/, '');
+  }
+  if (isElectron) {
+    return 'http://localhost:8000/api';
   }
   return isCapacitor ? DEFAULT_SERVER_URL : '/api';
 }

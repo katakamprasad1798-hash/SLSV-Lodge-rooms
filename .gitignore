@@ -19,6 +19,7 @@ backend/firebase_credentials.json
 
 # Builds & Generated Outputs
 frontend/dist/
+frontend/release/
 frontend/android/app/build/
 frontend/android/.gradle/
 frontend/android/build/

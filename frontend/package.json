@@ -3,10 +3,15 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite --port 5173",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron": "electron .",
+    "electron:dev": "electron .",
+    "electron:build": "vite build && node scripts/build-desktop.cjs",
+    "electron:pack": "vite build && node scripts/build-desktop.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
@@ -18,9 +23,39 @@
     "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
+    "@electron/packager": "^20.3.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3",
+    "electron-packager": "^17.1.2",
     "vite": "^5.1.6"
+  },
+  "build": {
+    "appId": "com.slsv.lodge.desktop",
+    "productName": "SLSV Lodge Management",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "public/**/*"
+    ],
+    "win": {
+      "target": [
+        "portable",
+        "nsis"
+      ],
+      "icon": "public/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "SLSV Lodge Management",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }

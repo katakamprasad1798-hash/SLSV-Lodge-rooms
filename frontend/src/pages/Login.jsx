@@ -53,7 +53,7 @@ export default function Login() {
   };
 
   const handleConfigureServer = () => {
-    const current = api.getApiBase ? api.getApiBase() : (localStorage.getItem('slsv_custom_api_url') || 'https://jan-cheers-companion-dam.trycloudflare.com/api');
+    const current = api.getApiBase ? api.getApiBase() : (localStorage.getItem('slsv_custom_api_url') || 'https://equal-bears-kruger-identified.trycloudflare.com/api');
     const input = window.prompt(
       'Cloud Server Endpoint URL:\nEnter your 24/7 cloud server API URL (e.g. Render / Cloudflare / Cloud host):',
       current
@@ -214,7 +214,7 @@ export default function Login() {
               textDecoration: 'underline'
             }}
           >
-            ⚙️ Server URL: {api.getApiBase ? api.getApiBase() : (localStorage.getItem('slsv_custom_api_url') || 'https://jan-cheers-companion-dam.trycloudflare.com/api')}
+            ⚙️ Server URL: {api.getApiBase ? api.getApiBase() : (localStorage.getItem('slsv_custom_api_url') || 'https://equal-bears-kruger-identified.trycloudflare.com/api')}
           </button>
         </div>
       </div>
